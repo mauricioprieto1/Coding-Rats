@@ -27,6 +27,26 @@ class OrderInfo(BaseModel):
     list_price: float
     your_price: float
 
+class DistrictInfo(BaseModel):
+    district_id: int
+    name: str
+    location: str
+    contact_email: str
+    established_year: int
+
+class EducationalFocusArea(BaseModel):
+    id: int
+    district_id: int
+    focus_area: str
+
+class TrendingTopic(BaseModel):
+    id: int
+    district_id: int
+    focus_area_id: int
+    topic_name: str
+    collection_id: Optional[int] = None
+    last_updated: Optional[str] = None
+
 @app.get("/collections/", response_model=List[Collection])
 async def get_collections():
     response = supabase.table("collections").select("*").execute()
@@ -55,7 +75,25 @@ async def get_collection_details(collection_id: int):
         return {"collection": collection, "order_info": order_info}
     return {"error": "Collection not found"}
 
+# District Info Endpoints
+@app.get("/districts/", response_model=List[DistrictInfo])
+async def get_districts():
+    response = supabase.table("trends_db.district_info").select("*").execute()
+    return response.data
 
+# Educational Focus Areas Endpoints
+@app.get("/focus-areas/", response_model=List[EducationalFocusArea])
+async def get_focus_areas():
+    response = supabase.table("trends_db.educational_focus_areas").select("*").execute()
+    return response.data
+
+# Trending Topics Endpoints
+@app.get("/trending-topics/", response_model=List[TrendingTopic])
+async def get_trending_topics():
+    response = supabase.table("trends_db.trending_topics").select("*").execute()
+    return response.data
+
+# TESTING
 # Fetch collections
 collections = supabase.table("collections").select("*").execute()
 print(collections.data)
@@ -63,3 +101,4 @@ print(collections.data)
 # Fetch order-info
 order_info = supabase.table("order-info").select("*").execute()
 print(order_info.data)
+
